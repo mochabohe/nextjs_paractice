@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { Comforter } from 'next/font/google'
+import { Aclonica } from 'next/font/google'
 import './globals.css'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 
-const inter = Comforter({
+const inter = Aclonica({
   weight: '400',
   subsets: ['latin'],
 })
