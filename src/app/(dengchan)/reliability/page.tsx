@@ -1,5 +1,5 @@
 import React from 'react'
 
 export default function page() {
-  return <div>reliability萨达是发送到发送到封神榜</div>
+  return <div className='fs-3xl text-center'>reliability程落柠</div>
 }
