@@ -10,7 +10,7 @@ export type Product = {
 export const products: Product[] = [
   {
     id: 1,
-    name: 'Earthen Bottle',
+    name: '邓婵修改',
     href: '#',
     price: '$48',
     imageSrc:
