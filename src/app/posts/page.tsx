@@ -139,6 +139,12 @@ export default function PostsPage() {
         },
         body: JSON.stringify(values),
       })
+
+      // Check HTTP status first
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`)
+      }
+
       const resData = await res.json()
 
       if (resData.code === 0) {
@@ -150,7 +156,16 @@ export default function PostsPage() {
       }
     } catch (error) {
       console.error(error)
-      message.error('操作失败或校验未通过')
+      // More specific error message
+      if (error instanceof Error) {
+        message.error(
+          error.message.includes('validateFields')
+            ? '请检查表单输入'
+            : '网络请求失败，请重试'
+        )
+      } else {
+        message.error('操作失败，请重试')
+      }
     } finally {
       setModalLoading(false)
     }
