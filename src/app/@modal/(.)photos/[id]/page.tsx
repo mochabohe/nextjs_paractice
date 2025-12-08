@@ -4,11 +4,11 @@ import { products } from '@/app/data'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
-export default function page({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: { id: string } }) {
   const product = products.find((p) => p.id === Number(params.id))
+  const router = useRouter()
 
   if (!product) return <div>Product not found</div>
-  const router = useRouter()
 
   return (
     <div

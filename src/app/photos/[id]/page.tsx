@@ -2,7 +2,7 @@ import React from 'react'
 import { products } from '@/app/data'
 import Image from 'next/image'
 
-export default function page({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: { id: string } }) {
   const product = products.find((p) => p.id === Number(params.id))
 
   if (!product) return <div>Product not found</div>
