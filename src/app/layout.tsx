@@ -10,13 +10,18 @@ const inter = Aclonica({
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode
+  modal: React.ReactNode
 }>) {
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          {children}
+          {modal}
+        </AntdRegistry>
       </body>
     </html>
   )
