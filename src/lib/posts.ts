@@ -1,4 +1,9 @@
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+})
 
 export interface Post {
   id: number
@@ -10,7 +15,7 @@ const POSTS_KEY = 'posts'
 
 // 获取所有文章
 export async function getAllPosts(): Promise<Post[]> {
-  const posts = await kv.get<Post[]>(POSTS_KEY)
+  const posts = await redis.get<Post[]>(POSTS_KEY)
   return posts || []
 }
 
@@ -28,7 +33,7 @@ export async function createPost(data: Omit<Post, 'id'>): Promise<Post> {
     ...data,
   }
   posts.unshift(newPost)
-  await kv.set(POSTS_KEY, posts)
+  await redis.set(POSTS_KEY, posts)
   return newPost
 }
 
@@ -49,7 +54,7 @@ export async function updatePost(
     ...data,
   }
 
-  await kv.set(POSTS_KEY, posts)
+  await redis.set(POSTS_KEY, posts)
   return posts[index]
 }
 
@@ -62,6 +67,6 @@ export async function deletePost(id: number): Promise<boolean> {
     return false // 没有找到要删除的文章
   }
 
-  await kv.set(POSTS_KEY, filteredPosts)
+  await redis.set(POSTS_KEY, filteredPosts)
   return true
 }
