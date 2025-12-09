@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import db from '@/db'
+import { getAllPosts, createPost } from '@/lib/posts'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,11 +8,11 @@ export async function GET(request: NextRequest) {
     const pagesize = Number(searchParams.get('pagesize')) || 10
     const query = searchParams.get('query') || ''
 
-    const data = db.data.posts
+    const allPosts = await getAllPosts()
 
-    let filteredData = data
+    let filteredData = allPosts
     if (query) {
-      filteredData = data.filter((item) => {
+      filteredData = allPosts.filter((item) => {
         const { id, ...rest } = item
         return Object.values(rest).some((value) =>
           String(value).toLowerCase().includes(query.toLowerCase())
@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
     const total = filteredData.length
     const startIndex = (pagenum - 1) * pagesize
     const endIndex = startIndex + pagesize
-    filteredData =
+    const paginatedData =
       startIndex >= endIndex ? [] : filteredData.slice(startIndex, endIndex)
 
     return NextResponse.json({
       code: 0,
       message: '获取成功',
       data: {
-        list: filteredData,
+        list: paginatedData,
         total,
       },
     })
@@ -50,16 +50,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    await db.update(({ posts }) => {
-      posts.unshift({
-        id: Date.now(),
-        ...data,
-      })
-    })
+    const newPost = await createPost(data)
+
     return NextResponse.json({
       code: 0,
       message: '添加成功',
-      data,
+      data: newPost,
     })
   } catch (error) {
     console.error('POST /api/articles error:', error)

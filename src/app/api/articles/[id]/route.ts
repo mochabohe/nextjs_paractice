@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import db from '@/db'
+import { getPostById, updatePost, deletePost } from '@/lib/posts'
 
 interface IParams {
   params: { id: string }
@@ -7,7 +7,7 @@ interface IParams {
 
 export async function GET(request: Request, { params }: IParams) {
   try {
-    const post = db.data.posts.find((post) => post.id === +params.id)
+    const post = await getPostById(Number(params.id))
     return NextResponse.json({
       code: 0,
       message: '查找成功',
@@ -28,10 +28,19 @@ export async function GET(request: Request, { params }: IParams) {
 
 export async function DELETE(request: Request, { params }: IParams) {
   try {
-    // filter 不会修改原数组，需要重新赋值
-    await db.update((data) => {
-      data.posts = data.posts.filter((post) => post.id !== +params.id)
-    })
+    const success = await deletePost(Number(params.id))
+
+    if (!success) {
+      return NextResponse.json(
+        {
+          code: 1,
+          message: '文章不存在',
+          data: null,
+        },
+        { status: 404 }
+      )
+    }
+
     return NextResponse.json({
       code: 0,
       message: '删除成功',
@@ -54,26 +63,23 @@ export async function DELETE(request: Request, { params }: IParams) {
 export async function PATCH(request: Request, { params }: IParams) {
   try {
     const data = await request.json()
-    let idx = -1
+    const updatedPost = await updatePost(Number(params.id), data)
 
-    await db.update(({ posts }) => {
-      idx = posts.findIndex((post) => post.id === +params.id)
-
-      // Check if post exists
-      if (idx === -1) {
-        throw new Error('Post not found')
-      }
-
-      posts[idx] = {
-        ...posts[idx],
-        ...data,
-      }
-    })
+    if (!updatedPost) {
+      return NextResponse.json(
+        {
+          code: 1,
+          message: '文章不存在',
+          data: null,
+        },
+        { status: 404 }
+      )
+    }
 
     return NextResponse.json({
       code: 0,
       message: '修改成功',
-      data: db.data.posts[idx],
+      data: updatedPost,
     })
   } catch (error) {
     console.error('PATCH /api/articles/[id] error:', error)
